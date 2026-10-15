@@ -5,9 +5,8 @@ Run: python server.py
 By default listens on port 8765. For friends outside your network, host this server
 on a public Python host and configure the browser client to use its WebSocket URL.
 """
-import asyncio, json, secrets, string
+import asyncio, json, secrets, string, os
 import websockets
-
 rooms = {}
 
 def room_code():
@@ -69,8 +68,9 @@ async def broadcast(room):
         await asyncio.gather(*(s.send(payload) for s in sockets), return_exceptions=True)
 
 async def main():
-    print("Skybound room server listening on ws://0.0.0.0:8765")
-    async with websockets.serve(handler, "0.0.0.0", 8765, max_size=8192):
+    port = int(os.environ.get("PORT", "8765"))
+    print(f"Skybound room server listening on port {port}")
+    async with websockets.serve(handler, "0.0.0.0", port, max_size=8192):
         await asyncio.Future()
 
 if __name__ == "__main__":
